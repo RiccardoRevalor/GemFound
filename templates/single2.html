@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}{{ raccolta.Title }}{% endblock %}
+{% block content %}
+<link href="{{ url_for('static', filename='singlestyle.css') }}" rel="stylesheet">
+
+
+
+<div class="row">
+<main class="col-lg-8 col-12">
+<article class="container">
+    <section class="intro flow">
+      <h2 class="racInfo">{{raccolta.Title |e}}</h2>
+      <p class="racInfo">Info Principali:</p>
+        <p class="racInfo">&#128184; Target: {{raccolta.Target |e}} &euro;</p>
+        <p class="racInfo">&#127774; Attivazione: {{raccolta.ActivationDate ~' '~ raccolta.ActivationTime |e}}</p>
+        <p class="racInfo">&#127771; Chiusura: {{raccolta.CloseDate ~' '~ raccolta.CloseTime |e}}</p>
+        <p class="racInfo">&#128178; Minima donazione: {{raccolta.Min |e}} &euro;</p>
+        <p class="racInfo">&#128178; Massima donazione: {{raccolta.Max |e}} &euro;</p>
+        <p class="racInfo">&#127793;Tipo: 
+            {% if raccolta.Type == 0 %}
+                Raccolta Normale
+            {% else %}
+                Raccolta Lampo
+            {% endif %}
+        </p>
+        <!--<p class="racInfo">&#128185; Donazioni ammesse: da {{raccolta.Min |e}} a {{raccolta.Max |e}} &euro;</p>-->
+        {% if raccolta.Open == 1 %}
+        <p><strong class="racInfo">&#128176; Raccolto: {{raccolta.TotaleRaccolto |e}} &euro;</strong></p>
+        {% else %}
+          {% if sperimentale == 0 %}
+              <p><strong class="racInfo">&#128176; {% if raggiunto %}OBBIETTIVO RAGGIUNTO{% else %}OBBIETTIVO NON RAGGIUNTO{% endif%}</strong></p>
+              {% if raggiunto %}
+                <p><strong class="racInfo">&#127881;TOTALE RACCOLTO: {{raccolta.TotaleRaccolto |e}} &euro;</strong></p>
+              {% endif %}
+          {% else %}
+              <p><strong class="racInfo">&#128176; RACCOLTA NON ANCORA APERTA</strong></p>
+          {% endif %}
+        {% endif %}
+      {% if raccolta.Open == 1 %}
+        <progress id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" value="0" max="100"></progress>
+      {% else %}
+        {% if raggiunto %}
+          <progress id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated raggiunto" value="0" max="100"></progress>
+        {% else %}
+          <progress id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated Nonraggiunto" value="0" max="100"></progress>
+        {% endif %}
+      {% endif %}
+      {% if raccolta.Open == 1 %}
+      <button>
+        <a href="/donazione/{{raccolta.RacID}}">Dona ora!&#127873;</a>
+      </button>
+      {% else %}
+        {% if sperimentale == 0 %}
+          <p>&#128274;Raccolta chiusa&#128274;</p>
+        {% else %}
+          <p>&#128640;Raccolta non ancora aperta&#128640;</p>
+        {% endif %}
+      {% endif %}
+      <button onclick="copyToClipboard()">Condividi</button>
+      {% if current_user.id == raccolta.UserID and raccolta.Open == 1 %}
+      <button>
+        <a href="/mieraccolte">Gestisci</a>
+      </button>
+    {% endif %}
+    
+
+    </section>
+    <section class="details">
+      <header>Descrizione della Raccolta:</header>
+      <div class="scroll-container">
+        <article class="scroll-content">
+            {{raccolta.Description |e}}
+        </article>
+      </div>
+      <footer>Raccolta creata da: {{ nickname |e }}</footer>
+    </section>
+  </article>
+</main>
+
+
+
+
+<aside class="col-lg-4 col-12">
+{% if raccolta.Img != '0' %}
+    <article class="container img-container">
+        <img class="post-img" src="{{ url_for('static', filename=raccolta.Img) }}" alt="Nessuna foto trovata per la raccolta su: {{ raccolta.Title }}">
+    </article>
+{% else %}
+    <p>Immagine non disponibile</p>
+{% endif %}
+<article class="container donators-container">
+{% if nd > 0 %}
+    <ul class="donators-list">
+        {% for donazione in donazioni %}
+            <li>{{ donazione.NomeVisualizzato |e }} ha donato {{ donazione.Importo |e }} &euro;</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</article>
+</aside>
+
+<script>
+    // Calcola la percentuale di avanzamento
+    var totaleRaccolto = {{ raccolta.TotaleRaccolto |e}};
+    var target = {{ raccolta.Target |e}};
+    var percentuale = (totaleRaccolto / target) * 100;
+
+    // Aggiorna il valore della progress bar
+    document.getElementById("progressBar").value = percentuale;
+</script>
+
+<script>
+  function copyToClipboard() {
+      var link = window.location.href; // Ottieni il link corrente
+      navigator.clipboard.writeText(link).then(function() {
+          alert("Link copiato negli appunti: " + link);
+      }, function() {
+          alert("Errore durante la copia del link negli appunti.");
+      });
+  }
+  </script>
+{% endblock %}
+
+
+

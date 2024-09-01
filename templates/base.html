@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GemFound - {% block title %}{% endblock %}</title>
+    <meta name="keywords" content="raccolta, fondi, gemfound, donate">
+    <meta name="author" content="Riccardo Revalor">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Protest+Riot&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+
+  {% if not current_user.is_authenticated %}
+    <!-- Modale di Accesso -->
+    <div class="modal fade" id="loginModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="loginModalLabel">Accedi al tuo account</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form action="/signin2" method="POST">
+              <div class="mb-3">
+                <label for="emailInput" class="form-label">Nickname o indirizzo mail:</label>
+                <input type="text" class="form-control" id="emailInput" aria-describedby="emailHelp" name="loginName" required placeholder="Nickname oppure indirizzo mail">
+                <div id="emailHelp" class="form-text">Puoi accedere usando il tuo Nickname oppure la tua mail, &egrave; uguale!</div>
+              </div>
+              <div class="mb-3">
+                <label for="passwordInput" class="form-label">Password:</label>
+                <input type="password" class="form-control" id="passwordInput" name="password" required placeholder="Password del tuo account">
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                <button type="submit" class="btn btn-primary mt-3">Accedi</button>
+                <small>Non hai ancora un account? <button data-bs-toggle="modal" data-bs-target="#signupModal">Registrati</button></small>
+              </div>              
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- fine Modale di Accesso-->
+
+
+    <!-- Modale Registrazione-->
+<div class="modal fade" id="signupModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="signupModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <!-- Header del modale -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="signupModalLabel">Registrazione</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <!-- Corpo del modale -->
+      <div class="modal-body">
+        <!-- Form di registrazione -->
+        <form action="/signup2" method="POST">
+          <div class="mb-3">
+            <label for="nicknameInput" class="form-label">Nickname (max 10 caratteri)*</label>
+            <input type="text" class="form-control" name="nickname" id="nicknameInput" maxlength="10" required placeholder="Nickname, max 10 caratteri">
+            <div id="NickNameHelp" class="form-text">Il Nickname &egrave; unico e compare sulle donazioni da te create.</div>
+          </div>
+          <div class="mb-3">
+            <label for="nameInput" class="form-label">Nome*</label>
+            <input type="text" class="form-control" name="name" id="nameInput" required placeholder="Inserisci il tuo Nome">
+          </div>
+          <div class="mb-3">
+            <label for="surnameInput" class="form-label">Cognome*</label>
+            <input type="text" class="form-control" name="surname" id="surnameInput" required placeholder="Inserisci il tuo Cognome">
+          </div>
+          <div class="mb-3">
+            <label for="emailInput" class="form-label">Email*</label>
+            <input type="email" class="form-control" name="mail" id="emailInput" required placeholder="Inserisci un indirizzo email valido (es test@test.com)">
+          </div>
+          <div class="mb-3">
+            <label for="passwordInput" class="form-label">Password*</label>
+            <input type="password" class="form-control" name="password" id="passwordInput" required placeholder="Inserisci una password sicura">
+            <div id="passwordHelp" class="form-text">Assicurati di non rivelare a nessuno la tua password!</div>
+          </div>
+          <div id="signupInfo" class="form-text">I campi con (*) sono obbligatori. Mail e Nickname non devono coincidere.</div>
+          <span class="spazio_sotto"></span>
+          <!--<button type="submit" class="btn btn-primary spazio2">Registrati</button>-->
+          <div class="d-flex justify-content-between align-items-center">
+            <button type="submit" class="btn btn-primary mt-3">Registrati</button>
+            <small>Hai gi&agrave un account? <button data-bs-toggle="modal" data-bs-target="#loginModal">Accedi</button></small>
+          </div>  
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!--Fine Modale di Registrazione-->
+
+  {% endif %}
+
+
+    <header>
+      <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary" id="barra-navigazione">
+        <div class="container-fluid">
+          <!--<span class="navbar-brand mb-0 h1">GemFound</span> -->
+          <a class="navbar-brand protest-riot-regular">
+            <img src="{{ url_for('static', filename='premium.png') }}" alt="Logo" width="30" height="30" class="d-inline-block align-top" />
+            GemFound
+        </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link testo" aria-current="page" href="/">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link testo" href="{{ url_for('raccoltepassate') }}">Raccolte Fondi passate</a>
+              </li>
+              {% if current_user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link testo" href="{{ url_for('newraccolta') }}">Crea una Raccolta Fondi!</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link testo" href="{{ url_for('mieraccolte') }}">Le mie Raccolte</a>
+              </li>
+              {% endif %}
+            </ul>
+
+            {% if current_user.is_authenticated %}
+            <a href="/account/{{ current_user.id |e }}" class="btn btn-outline-light testo" title="AccountInfo">{{ current_user.nickname |e }}</a>
+            <span class="leave_margin"></span>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-light testo" title="Logout">Logout</a>
+            {% else %}
+            <!--<a href="{{ url_for('signup') }}" class="btn btn-outline-light testo" title="Registrati">Registrati</a>-->
+            <!-- href="{{ url_for('signin') }}"  -->
+            <button type="button" class="btn btn-outline-light testo" title="Registrati" data-bs-toggle="modal" data-bs-target="#signupModal">Registrati</button>
+            <span class="leave_margin"></span>
+            <button type="button" class="btn btn-outline-light testo" title="Accedi" data-bs-toggle="modal" data-bs-target="#loginModal">Accedi</button>
+            {% endif %}
+          </div>
+        </div>
+      </nav>
+
+    </header>
+
+    <div class="container-fluid under-nav">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      {%block content %}{% endblock %}
+      <!--
+      <div class="row">
+        <main class="col-lg-12 col-12">
+           blocco content
+        </main>
+        <aside class="col-lg-4 col-12">
+           blocco sidebar
+        </aside> 
+      </div>   -->
+    </div> 
+
+    <div class="container-fluid">
+      <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 me-2">
+        <div class="col-md-4 d-flex align-items-center">
+          <span class="mb-3 mb-md-0 text-muted">GemFound&#174;, Copyright&#169; 2024 by Riccardo Revalor</span>
+        </div>
+        <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
+          <li class="ms-3"><a class="text-muted" href="#"><i class="bi bi-twitter"></i></a></li>
+          <li class="ms-3"><a class="text-muted" href="#"><i class="bi bi-instagram"></i></a></li>
+          <li class="ms-3"><a class="text-muted" href="#"><i class="bi bi-envelope"></i></a></li>
+        </ul>
+      </footer>
+    </div>
+
+  
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  </body>
+</html>

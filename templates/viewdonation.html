@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}MieRaccolte{% endblock %}
+{% block MieRaccolte_active %}active{% endblock %}
+{% block content %}
+<link href="{{ url_for('static', filename='singlestyle.css') }}" rel="stylesheet">
+
+<main>
+<a href="/account/{{ current_user.id |e }}">Torna al mio account</a>
+<article class="container">
+    <p>Commento donazione:</p> 
+    <p>{{donazione.Commento |e}}</p>
+</article>
+</main>
+
+
+{% endblock %}

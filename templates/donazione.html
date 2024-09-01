@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}{{raccolta.Title}}{% endblock %}
+{% block content %}
+
+<!--
+      <div class="row">
+        <main class="col-lg-12 col-12">
+           blocco content
+        </main>
+        <aside class="col-lg-4 col-12">
+           blocco sidebar
+        </aside> 
+      </div>   -->
+
+<div class="row">
+<main class="col-lg-8 col-12">
+<div class="container2 mt-5">
+    <h2>Dona a: {{raccolta.Title |e}}</h2>
+    <form action="/donazione2/{{ raccolta.RacID |e}}" method="POST">
+        <div class="form-group">
+            <label for="amount">Importo donazione*</label>
+            <label for="amount">[Minimo: {{ raccolta.Min |e}}</label>
+            <label for="amount">Massimo: {{ raccolta.Max |e}}]</label>
+            <input type="number" class="form-control" id="importo" name="importo" placeholder="Inserisci l'importo" required min="{{ raccolta.Min |e}}" max="{{ raccolta.Max |e}}">
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="firstName" id="firstNameLabel">Nome</label>
+                <input type="text" class="form-control" id="firstNameInput" name="firstName" placeholder="Inserisci il tuo nome" {% if current_user.is_authenticated %}value="{{ current_user.name |e}} "{% endif %}>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="lastName" id="lastNameLabel">Cognome</label>
+                <input type="text" class="form-control" id="lastNameInput" name="lastName" placeholder="Inserisci il tuo cognome" {% if current_user.is_authenticated %}value="{{ current_user.surname |e}} "{% endif %}>
+            </div>
+        </div>
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" name="anonimo" id="anonimoCheckBox">
+            <label class="form-check-label" for="AnonimoLabel">Rimani Anonimo</label>
+        </div>
+        {% if current_user.is_authenticated %}
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" name="usenick" id="nickNameCheckBox">
+            <label class="form-check-label" for="nickNameLabel">Usa il Nickname {{current_user.nickname |e}} e associa la donazione al tuo profilo</label>
+        </div>
+        {% endif %}
+        <div class="form-group">
+            <label for="descriptionInput">Commento donazione (opzionale, max 100 caratteri)</label>
+            <textarea class="form-control" id="commento" name="commento" rows="3" maxlength="100"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="address">Indirizzo fatturazione*</label>
+            <input type="text" class="form-control" id="address" name="address" placeholder="Inserisci il tuo indirizzo di fatturazione" required>
+        </div>
+        <div class="form-group">
+            <label for="creditCard">Carta di Credito*</label>
+            <input type="text" class="form-control" id="creditCard" name="creditCard" placeholder="Inserisci il numero della carta di credito (max 16 cifre)" required maxlength="16" pattern="[0-9]{1,16}">
+            <small id="creditCardHelp" class="form-text text-muted">Il numero della Carta di Credito si trova sul fronte/retro della carta ed ha massimo 16 cifre.</small>
+        </div>
+        <div class="form-group">
+            <label for="cvv">CVV (Codice di Sicurezza)*</label>
+            <input type="text" class="form-control" id="cvv" name="cvv" placeholder="Inserisci il codice CVV (3 cifre)" pattern="[0-9]{3}" maxlength="3" required pattern="[0-9]{3}">
+            <small id="cvvHelp" class="form-text text-muted">Il codice CVV è un numero a tre cifre sul retro della Carta di Credito.</small>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Dona ora!</button>
+    </form>
+</div>
+
+
+</main>
+
+<aside class="col-lg-4 col-12">
+{% if raccolta.Img != '0' %}
+    <img class="post-img" src="{{ url_for('static', filename=raccolta.Img) }}" alt="Nessuna foto trovata per la raccolta su: {{ raccolta.Title }}">
+{% else %}
+    <p>Immagine non disponibile per la Raccolta</p>
+{% endif %}
+</aside>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#anonimoCheckBox').change(function() {
+            if (this.checked) {
+                $('#firstNameLabel').hide();
+                $('#firstNameInput').hide();
+                $('#firstNameInput').prop('disabled', true);
+                $('#lastNameLabel').hide();
+                $('#lastNameInput').hide();
+                $('#lastNameInput').prop('disabled', true);
+                $('#nickNameCheckBox').prop('checked', false);
+            } else {
+                $('#firstNameLabel').show();
+                $('#firstNameInput').show();
+                $('#lastNameLabel').show();
+                $('#lastNameInput').show();
+                $('#firstNameInput').prop('disabled', false);
+                $('#lastNameInput').prop('disabled', false);
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#nickNameCheckBox').change(function() {
+            if (this.checked) {
+                $('#firstNameLabel').hide();
+                $('#firstNameInput').hide();
+                $('#lastNameLabel').hide();
+                $('#lastNameInput').hide();
+                $('#anonimoCheckBox').prop('checked', false);
+                $('#lastNameInput').prop('disabled', true);
+                $('#firstNameInput').prop('disabled', true);
+            } else {
+                $('#firstNameLabel').show();
+                $('#firstNameInput').show();
+                $('#lastNameLabel').show();
+                $('#lastNameInput').show();
+                $('#firstNameInput').prop('disabled', false);
+                $('#lastNameInput').prop('disabled', false);
+            }
+        });
+    });
+</script>
+
+{% endblock %}

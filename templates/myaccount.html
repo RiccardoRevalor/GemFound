@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}MieRaccolte{% endblock %}
+{% block MieRaccolte_active %}active{% endblock %}
+{% block content %}
+
+<link href="{{ url_for('static', filename='tablestyle.css') }}" rel="stylesheet">
+
+
+
+<div class="row">
+<main class="col-lg-8 col-12">
+<div class="container">
+    <h2>Donazioni ricevute verso le tue Raccolte</h2>
+    <ul class="responsive-table">
+      <small>Vengono mostrate in cima le donazioni pi&ugrave; recenti. Cliccare sulla donazione per visualizzare il commento per esteso.</small>
+      <li class="table-header">
+        <div class="col col-1">Titolo Raccolta</div>
+        <div class="col col-2">Importo donazione</div>
+        <div class="col col-3">Da parte di</div>
+        <div class="col col-4">Data donazione</div>
+        <div class="col col-4">Numero Transazione associata</div>
+        <div class="col col-4">Commento</div>
+      </li>
+      {% for don in donazioni %}
+      <li class="table-row grey-selected" data-transazione="{{ don.numTransazione |e }}">
+        <div class="col col-1 boldtext" data-label="Titolo Raccolta">{{ don.RacTitle |e }}</div>
+        <div class="col col-2" data-label="Importo Donazione">{{ don.Importo |e }} &euro;</div>
+        <div class="col col-3" data-label="Nome Donatore">{{ don.NomeVisualizzato |e }}</div>
+        <div class="col col-4" data-label="Data">{{ don.Data |e }}</div>
+        <div class="col col-4" data-label="Num Transazione">{{ don.numTransazione |e }}</div>
+        <div class="col col-4 Commento" data-label="DonCommento">{{ don.Commento |e }}</div>
+      </li>
+    {% endfor %}
+    </ul>
+</div>
+</main>
+
+
+<aside class="col-lg-4 col-12">
+ <div class="p-4 mb-3 bg-light rounded">
+    <h3>{{ current_user.name  ~' '~ current_user.surname |e }}</h3>
+    <!-- mostra le info dell'account-->
+    <h3><strong>VALORE PORTAFOGLIO: {{ ptfValue |e}} &euro;</strong></h3>
+    <p>Dati Account:</p>
+    <p>Email: {{ current_user.mail |e }}</p>
+    <p>Nickname: {{ current_user.nickname |e }}</p>
+</div>
+</aside>
+
+
+
+<!--script che limita la lunghezza mostrata dei commenti--> 
+<script>
+    window.onload = function() {
+      var commenti = document.querySelectorAll(".Commento");
+      var maxLength = 25; // Numero massimo di caratteri consentiti
+      commenti.forEach(function(commento) {
+        var testo = commento.textContent;
+        if (testo.length > maxLength) {
+          commento.textContent = testo.substring(0, maxLength) + "...";
+        }
+      });
+    };
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var rows = document.querySelectorAll('.table-row');
+      rows.forEach(function(row) {
+        row.addEventListener('click', function() {
+          var transazione = this.getAttribute('data-transazione');
+          window.location.href = '/readComment/' + transazione;
+        });
+      });
+    });
+</script>
+{% endblock %}

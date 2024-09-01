@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}MieRaccolte{% endblock %}
+{% block MieRaccolte_active %}active{% endblock %}
+{% block content %}
+
+<link href="{{ url_for('static', filename='tablestyle.css') }}" rel="stylesheet">
+
+<div class="row">
+<main class="col-lg-8 col-12">
+<div class="container">
+
+
+    <ul class="responsive-table">
+
+      {% if ricerca %}
+      <h2>Ricerca per: {{keyword |e}}</h2>
+      {% else %}
+      <h2>Storico Raccolte create</h2>
+      {% endif %}
+  
+      {% if not ricerca %}
+      <div class="row">
+        <div class="col-lg-8 col-12">
+            <form action="{{ url_for('search_raccolte')}}" method="GET">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" placeholder="Cerca raccolta per titolo (max 30 caratteri)" name="ricercaRaccolta" required maxlength="30">
+                    <button class="btn btn-outline-primary" type="submit">Cerca</button>
+                </div>
+            </form>
+        </div>
+      </div>
+      {% else %}
+      <div class="row">
+          <div class="col-lg-8 col-12">
+            <a href="{{ url_for('mieraccolte')}}"  class="btn btn-outline-primary">Torna indietro</a>
+          </div>
+      </div>
+      {% endif %}
+
+      <li class="table-header">
+        <div class="col col-1">Titolo Raccolta</div>
+        <div class="col col-2">Target</div>
+        <div class="col col-3">Totale Raccolto</div>
+        <div class="col col-4">Attivata il:</div>
+        <div class="col col-4">Chiusura il:</div>
+        <div class="col col-4">Azioni</div>
+      </li>
+      {% for raccolta in raccolte %}
+      <li class="table-row">
+        <div class="col col-1 boldtext" data-label="Titolo Raccolta">{{ raccolta.Title |e }}</div>
+        <div class="col col-2" data-label="Target">{{ raccolta.Target |e }} &euro;</div>
+        <div class="col col-3" data-label="Totale Raccolto">{{ raccolta.TotaleRaccolto |e }} &euro;</div>
+        <div class="col col-4" data-label="Attivazione">{{ raccolta.ActivationDate ~' '~ raccolta.ActivationTime |e }}</div>
+        <div class="col col-4" data-label="Chiusura">{{ raccolta.CloseDate ~' '~ raccolta.CloseTime |e }}</div>
+        <div class="btn-group col col-4">
+            {% if raccolta.Open == 1 %}
+            <a href="/modificaraccolta/{{ raccolta.RacID }}" class="fixedb btn btn-primary" aria-current="page">Modifica</a>
+            <a href="/deleteraccolta/{{raccolta.RacID}}" class="fixedb btn btn-primary">Elimina</a>
+            {% else %}
+            <a href="#" class="fixedb btn btn-secondary disabled" aria-current="page">Modifica</a>
+            <a href="#" class="fixedb btn btn-secondary disabled" aria-current="page">Elimina</a>
+            {% endif %} 
+            <a href="/raccolta/{{raccolta.RacID}}" class="fixedb btn btn-primary">Visita</a>
+            
+          </div>
+      </li>
+    {% endfor %}
+    </ul>
+  </div>
+</main>
+
+
+<aside class="col-lg-4 col-12">
+ <div class="p-4 mb-3 bg-light rounded">
+    <h3>Benvenuto, {{ current_user.name  ~' '~ current_user.surname |e }}</h3>
+  <p>Il Manager delle Raccolte ti permette di gestire in un unico posto tutte le Raccolte da te create.</p>
+  <p>Tieni a mente che le Raccolte gi&agrave; chiuse non possono essere n&egrave; modificate n&egrave; eliminate.</p>
+  <p><a href="{{ url_for('newraccolta') }}">Crea una nuova Raccolta</a></p>
+  <p><a href="{{ url_for('index') }}">Torna alla Home</a></p>
+  <h4><strong>VALORE PORTAFOGLIO: {{ ptfValue |e}} &euro;</strong></h4>
+  <p>Il valore del portafoglio indica la quantit&agrave; di denaro ricevuta tramite donazioni verso raccolte chiuse che hanno raggiunto il Target prefissato. Per revisionare lo storico delle donazioni associate alle tue raccolte Fondi:</p>
+  <p><a href="/account/{{ current_user.id |e }}">Clicca qui</a></p> 
+</div>
+</aside>
+{% endblock %}

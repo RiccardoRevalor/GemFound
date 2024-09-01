@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Accedi{% endblock %}
+{% block signin_active %}active{% endblock %}
+
+{% block content %}
+
+{% if TriedToCreate %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <label>Deve essere effettuato l'accesso per creare una raccolta fondi!</label> 
+</div>
+{% endif %}
+
+<h3>Accedi utilizzando il tuo NickName o la tua mail:</h3>
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-12 col-lg-6">
+  <div class="bg-light p-4 border rounded mb-3">
+    <form action="/signin2" method="POST">
+      <div class="mb-3">
+        <label for="emailInput" class="form-label">Nickname o indirizzo mail:</label>
+        <input type="text" class="form-control" id="emailInput" aria-describedby="emailHelp" name="loginName" required placeholder="Nickname oppure indirizzo mail">
+        <div id="emailHelp" class="form-text">Non condivideremo la tua mail con nessuno.</div>
+      </div>
+      <div class="mb-3">
+        <label for="passwordInput" class="form-label">Password:</label>
+        <input type="password" class="form-control" id="passwordInput" name="password" required placeholder="Password del tuo account">
+      </div>
+      <small>Non hai ancora un account? <a href="/signup">Registrati</a></small>
+      <button type="submit" class="btn btn-primary mt-3">Accedi</button>
+    </form>
+  </div>
+</div>
+</div>
+</div>
+
+{% endblock %}

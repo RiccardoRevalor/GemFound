@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% block title %}{newRac}{% endblock %}
+{% block content %}
+
+{% if update %}
+<div class="container mt-5">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <h2 class="mb-4">Modifica Raccolta esistente</h2>
+            <form action="/modificaraccolta2/{{ raccolta.RacID }}" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="titleInput">Titolo Raccolta (max 30 caratteri)*</label>
+                    <input type="text" class="form-control" id="titleInput" name="title" value="{{ raccolta.Title |e }}" required maxlength="30">
+                </div>
+                <div class="form-group">
+                    <label for="descriptionInput">Descrizione (max 300 caratteri)*</label>
+                    <textarea class="form-control" id="descriptionInput" name="description" rows="3" required maxlength="300" minlength="1">{{ raccolta.Description |e }}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="targetInput">Target monetario (&euro;)*</label>
+                    <input type="number" class="form-control" id="targetInput" name="target" value="{{ raccolta.Target |e }}" required min="1" max="1000000">
+                </div>
+                <div class="form-group">
+                    <label for="activationInput" id="dataOraInputLabel">Data e ora di attivazione</label>
+                    <input type="datetime-local" class="form-control" id="activationInput" name="activation" value="{{ raccolta.ActivationDate |e}}T{{ raccolta.ActivationTime |e}}" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="closeInput" id="closeLabel">Data e ora di chiusura</label>
+                    <input type="datetime-local" class="form-control" id="closeInput" name="close" {% if raccolta.Type == 1 %}disabled{% endif %} value="{{ raccolta.CloseDate |e}}T{{ raccolta.CloseTime |e}}">
+                </div>
+                <div class="form-group">
+                    <label for="minInput">Minima donazione (&euro;)*</label>
+                    <input type="number" class="form-control" id="minInput" name="min" required value="{{ raccolta.Min |e }}" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="maxInput">Massima donazione (&euro;)*</label>
+                    <input type="number" class="form-control" id="maxInput" name="max" required value="{{ raccolta.Max |e }}" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="typeInput">Tipo*</label>
+                    <select class="form-control" id="typeInput" name="type" required>
+                        <option value="0" {% if raccolta.Type == 0 %}selected{% endif %}>Raccolta Normale</option>
+                        <option value="1" {% if raccolta.Type == 1 %}selected{% endif %}>Raccolta Lampo</option>
+                    </select>
+                </div>
+                {% if raccolta.Img != '0' %}
+                <div class="mb-3 form-group" id="containerImg">
+                    <label for="fileInput" class="form-label" id="ImgLabel">Immagine attualmente associata alla Raccolta</label>
+                    <img id="ImgBlock" class="post-img" src="{{ url_for('static', filename=raccolta.Img) }}" alt="Immagine attuale non trovata">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" name="deleteImg" id="deleteImg">
+                    <label class="form-check-label" for="deleteImg" id="deleteImgCheckBox" >Elimina Immagine</label>
+                </div>
+                {% endif %}
+                <div class="mb-3 form-group" id="newImgBlock">
+                    <label for="fileInput" class="form-label">Scegliere una nuova Immagine?</label>
+                    <input type="file" class="form-control" name="img" id="img" accept=".jpg, .jpeg, .png, .gif, .bmp">
+                </div>
+                <div id="newracInfo" class="form-text">I campi con (*) sono obbligatori. I campi in grigio non sono modificabili perch&egrave; la Raccolta &egrave; stata gi&agrave; creata.</div>
+                <span class="spazio_sotto"></span>
+                <button type="submit" class="btn btn-primary">Conferma Modifiche</button>
+                <a type="button" href = "{{ url_for('mieraccolte') }}" class="btn btn-secondary">Annulla</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Logica per disablitare o meno il campo data e ora di chiusura in base al tipo di raccolta selezionato
+    document.getElementById('typeInput').addEventListener('change', function() {
+        var selectedType = this.value;
+        var closeTimeGroup = document.getElementById('closeInput');
+        if (selectedType == 1) {
+            closeTimeGroup.disabled = true;
+        } else {
+            closeTimeGroup.disabled = false;
+        }
+    });
+</script>
+
+{% if raccolta.Img != '0' %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+$(document).ready(function() {
+    $('#deleteImg').change(function() {
+        if (this.checked) {
+            $('#ImgLabel').hide();
+            $('#ImgBlock').hide(); 
+            $('#img').prop('disabled', true);
+            $('#newImgBlock').hide();
+            $('#img').val('');
+
+        } else {
+            $('#ImgLabel').show();
+            $('#ImgBlock').show();
+            $('#newImgBlock').show();
+            $('#img').prop('disabled', false);
+            $('#img').val('');
+        }
+    });
+});
+
+</script>
+
+{% endif %}
+
+
+{% else %}
+<div class="container mt-5">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <h2 class="mb-4">Nuova Raccolta Fondi</h2>
+            <form action="/crearaccolta" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="titleInput">Titolo Raccolta (max 30 caratteri)*</label>
+                    <input type="text" class="form-control" id="titleInput" name="title" required maxlength="30" placeholder="Inserisci titolo (max 30 caratteri)">
+                </div>
+                <div class="form-group">
+                    <label for="descriptionInput">Descrizione (max 300 caratteri)*</label>
+                    <textarea class="form-control" id="descriptionInput" name="description" rows="3" required maxlength="300" minlength="1"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="targetInput">Target monetario (&euro;)*</label>
+                    <input type="number" class="form-control" id="targetInput" name="target" required min="1" max="1000000" placeholder="Il Target deve essere &gt; 0 e &le; 1 mln">
+                </div>
+                <div class="form-group">
+                    <label for="activationInput" id="dataOraInputLabel">Data e ora di attivazione (funzione sperimentale)</label>
+                    <div class="form-text" id="sperimentalHelp1">Permette di schedulare una raccolta per farla incominciare nel futuro.</div>
+                    <div class="form-text" id="sperimentalHelp2">Fintanto che la raccolta non sarà iniziata, non sarà possibile modificarla e/o eliminarla.</div>
+                    <input type="datetime-local" class="form-control" id="activationInput" name="activation">
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" name="attiva_subito" id="attivaSubitoCheckbox" checked>
+                    <label class="form-check-label" for="attivaSubitoCheckbox">Attiva Raccolta Subito</label>
+                </div>
+                <div class="form-group">
+                    <label for="closeInput" id="closeLabel">Data e ora di chiusura</label>
+                    <input type="datetime-local" class="form-control" id="closeInput" name="close">
+                </div>
+                <div class="form-group">
+                    <label for="minInput">Minima donazione (&euro;)*</label>
+                    <input type="number" class="form-control" id="minInput" name="min" required min="1" placeholder="Deve essere &gt; 0, &le; Target">
+                </div>
+                <div class="form-group">
+                    <label for="maxInput">Massima donazione (&euro;)*</label>
+                    <input type="number" class="form-control" id="maxInput" name="max" required min="1" placeholder="Deve essere &gt; 0, &le; Target">
+                </div>
+                <div class="form-group">
+                    <label for="typeInput">Tipo*</label>
+                    <select class="form-control" id="typeInput" name="type" required>
+                        <option value="0">Raccolta Normale</option>
+                        <option value="1">Raccolta Lampo</option>
+                    </select>
+                </div>
+                <div class="mb-3 form-group">
+                    <label for="fileInput" class="form-label">Immagine rappresentativa</label>
+                    <input type="file" class="form-control" name="img" id="img_control_newRac" accept=".jpg, .jpeg, .png, .gif, .bmp">
+                </div>
+                <div id="newracInfo" class="form-text">I campi con (*) sono obbligatori. Assicurati che la raccolta sia per una giusta causa.</div>
+                <span style="display: block; margin-top: 10px;"></span>
+                <button type="submit" class="btn btn-primary">Crea Raccolta</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Logica per nascondere o mostrare il campo data e ora di chiusura in base al tipo di raccolta selezionato
+    document.getElementById('typeInput').addEventListener('change', function() {
+        var selectedType = this.value;
+        var closeTimeGroup = document.getElementById('closeInput');
+        var closeLabel = document.getElementById('closeLabel');
+        if (selectedType == 1) {
+            closeTimeGroup.style.display = 'none';
+            closeLabel.style.display = 'none';
+        } else {
+            closeTimeGroup.style.display = 'block';
+            closeLabel.style.display = 'block';
+        }
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Funzione per controllare se la data e l'ora sono nel formato predefinito
+        function isDefaultDateTime(dateTimeInput) {
+            return dateTimeInput.val() === "";//"gg/mm/aaaaT00:00";
+        }
+    
+        // Controlla se entrambe le date e le ore sono nel formato predefinito e impedisce il submit se lo sono
+        $('form').submit(function(event) {
+            var dataOraAttivazioneInput = $('#activationInput');
+            var dataOraChiusuraInput = $('#closeInput');
+            console.log("Data e ora di attivazione:", dataOraAttivazioneInput.val());
+            console.log("Data e ora di chiusura:", dataOraChiusuraInput.val());
+    
+            if (dataOraAttivazioneInput.is(':visible') && isDefaultDateTime(dataOraAttivazioneInput)) {
+                event.preventDefault(); // Impedisce il submit del modulo
+                alert("Inserisci una data e un'ora di attivazione valide.");
+            }
+    
+            if (dataOraChiusuraInput.is(':visible') && isDefaultDateTime(dataOraChiusuraInput)) {
+                event.preventDefault(); // Impedisce il submit del modulo
+                alert("Inserisci una data e un'ora di chiusura valide.");
+            }
+        });
+    });
+    </script>
+
+<script>
+$(document).ready(function() {
+    $('#attivaSubitoCheckbox').change(function() {
+        if (this.checked) {
+            $('#dataOraInputLabel').hide();
+            $('#activationInput').hide();
+            $('#sperimentalHelp1').hide();
+            $('#sperimentalHelp2').hide();
+        } else {
+            $('#dataOraInputLabel').show();
+            $('#activationInput').show();
+            $('#sperimentalHelp1').show();
+            $('#sperimentalHelp2').show();
+        }
+    }).change(); // Chiamata della funzione change manualmente dopo il caricamento della pagina;
+});
+</script>
+
+
+<script>
+document.getElementById("minInput").addEventListener("input", function() {
+    if (this.value < 1) {
+        this.setCustomValidity("Il valore minimo deve essere 1");
+    } else {
+        this.setCustomValidity("");
+    }
+});
+</script>
+
+<script>
+    document.getElementById("maxInput").addEventListener("input", function() {
+        if (this.value < 1) {
+            this.setCustomValidity("Il valore minimo deve essere 1");
+        } else {
+            this.setCustomValidity("");
+        }
+    });
+</script>
+
+{% endif %}
+
+
+
+
+
+
+
+{% endblock %}

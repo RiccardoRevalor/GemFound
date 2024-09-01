@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='indexstyle.css') }}">
+
+<!-- supporto IE 8/9-->
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<!---->
+
+
+<div class="padded"> 
+    <div class="container">
+        <h2 class="text-center typing-text">{% if mode == 1 %}Raccolte attive ora:{% else %}Raccolte Fondi passate, ormai chiuse:{% endif %}</h2>
+        <div class="row">
+            {% for raccolta in raccolte_attive %}
+            <div class="col-xs-12 col-sm-4 col-lg-4"> 
+                <div class="card">
+                    {% if raccolta.Img != '0' %}
+                    <img class="card-img" src="{{ url_for('static', filename=raccolta.Img) }}" alt="Nessuna foto trovata per la raccolta su: {{ raccolta.Title |e}}">
+                    {% else %}
+                    <img class="card-img" src="{{ url_for('static', filename='default.jpg') }}" alt="Nessuna foto trovata per la raccolta su: {{ raccolta.Title |e}}">
+                    {% endif %}
+                    <div class="card-category"></div>
+                    <div class="card-description">
+                        <h2 class="aggiungititleShadow">{{ raccolta.Title |e}}</h2>
+                        <p class = "aggiungititleShadow">{% if raccolta.Type == 1 %}&#129512;Raccolta LAMPO {%else%}&#127793;Raccolta Normale{% endif %}</p>
+                        <!--<p class="closingDate">{% if mode == 1 %}&#128337;CHIUSURA IN: {{raccolta.tempoRimanente |e}}{% else %}CHIUSA IL: {{raccolta.CloseDate |e}} {{raccolta.CloseTime |e}}{% endif %}</p> -->
+                        {% if mode == 0 %}
+                        <!--<p class="closingDate">{% if raccolta.Raggiunto == 1 %}OBBIETTIVO RAGGIUNTO{% else %}OBBIETTIVO NON RAGGIUNTO{% endif %}</p>-->
+                            {% if raccolta.Raggiunto == 1 %}
+                                <p class="closingDate-raggiunto">&#127937;OBBIETTIVO RAGGIUNTO</p>
+                            {% else %}
+                                <p class="closingDate-nonraggiunto">&#128308;OBBIETTIVO NON RAGGIUNTO</p>
+                            {% endif %}
+                        {% else %}
+                        <p class="closingDate-nonraggiunto">&#128337;CHIUSURA IN: {{raccolta.tempoRimanente |e}}</p>
+                        {% endif %}
+                    </div>
+                    {% if mode == 0 %}
+                    <p class="card-closeDate">&#128274;CHIUSA IL: {{raccolta.CloseDate |e}} {{raccolta.CloseTime}}</p>
+                    {% endif %}
+                    <a class="card-link" href="raccolta/{{raccolta.RacID |e}}" ></a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!---
+<script>
+var idleTime = 0;
+
+// Incrementa il tempo trascorso senza azioni dell'utente
+document.addEventListener("DOMContentLoaded", function() {
+    // Incrementa il tempo ogni secondo
+    var idleInterval = setInterval(timerIncrement, 1000); // 1 secondo
+
+    // Resetta il tempo se l'utente interagisce con la pagina
+    document.addEventListener("mousemove", function() {
+        idleTime = 0;
+    });
+    document.addEventListener("keypress", function() {
+        idleTime = 0;
+    });
+});
+
+function timerIncrement() {
+    idleTime = idleTime + 1;
+    if (idleTime > 60) { // ogni min
+        window.location.reload();
+    }
+}
+</script>
+-->
+
+{% endblock %}
