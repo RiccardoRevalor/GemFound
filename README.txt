@@ -113,3 +113,9 @@ c) nel caso di utenti autenticati, inserire il proprio NickName (es rpix17, uten
 è un form che effettua una richiesta POST.
 TEMPLATE HTML: donazione.html
 STYLESHEET CSS: style.css 
+
+## Technologies Used
+- **HTML**
+- **CSS**
+- **JavaScript**
+- **Python**
